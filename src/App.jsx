@@ -1,63 +1,25 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import {
-  ArrowUp,
-  BarChart3,
-  Brain,
-  CheckCircle2,
-  ClipboardList,
-  Compass,
-  Lightbulb,
-  Monitor,
-  Moon,
-  Sun,
-  Target,
-} from 'lucide-react';
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useReducedMotion } from 'framer-motion';
+import { BackToTop } from './components/BackToTop.jsx';
+import { Header } from './components/Header.jsx';
+import { HOME_SECTION_ID, THEME_STORAGE_KEY, themeOptions } from './constants/ui.js';
 import { reportData } from './data/reportData.js';
-import oneaixLogo from './assets/oneaix-logo.png';
-
-const THEME_STORAGE_KEY = 'midyear-report-theme';
-const HOME_SECTION_ID = 'oneaix';
-
-const themeOptions = [
-  { value: 'system', label: '跟随系统', Icon: Monitor },
-  { value: 'light', label: '浅色', Icon: Sun },
-  { value: 'dark', label: '深色', Icon: Moon },
-];
-
-const statusClassName = {
-  已完成: 'status status-done',
-  部分完成: 'status status-partial',
-  未完成: 'status status-missed',
-};
-
-const sectionIcons = {
-  okr: Target,
-  impact: BarChart3,
-  kiss: Compass,
-  plan: ClipboardList,
-  battles: Brain,
-  suggestions: Lightbulb,
-};
+import { BattleItemsSection } from './sections/BattleItemsSection.jsx';
+import { BusinessImpactSection } from './sections/BusinessImpactSection.jsx';
+import { HeroSection } from './sections/HeroSection.jsx';
+import { KissReviewSection } from './sections/KissReviewSection.jsx';
+import { OkrReviewSection } from './sections/OkrReviewSection.jsx';
+import { PlanSection } from './sections/PlanSection.jsx';
+import { SuggestionsSection } from './sections/SuggestionsSection.jsx';
 
 function App() {
   const shouldReduceMotion = useReducedMotion();
+  const scrollTimerRef = useRef(null);
   const [theme, setTheme] = useState(() => {
     return window.localStorage.getItem(THEME_STORAGE_KEY) || 'system';
   });
   const [activeSection, setActiveSection] = useState(HOME_SECTION_ID);
+  const [isScrolling, setIsScrolling] = useState(false);
 
   const sectionIds = useMemo(() => {
     return [HOME_SECTION_ID, ...reportData.navItems.map((item) => item.id)];
@@ -78,7 +40,13 @@ function App() {
 
   useEffect(() => {
     function updateActiveSection() {
-      const viewportFocusY = window.innerHeight * 0.45;
+      setIsScrolling(true);
+      window.clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = window.setTimeout(() => {
+        setIsScrolling(false);
+      }, 180);
+
+      const viewportFocusY = window.innerHeight * 0.48;
       const sections = sectionIds
         .map((id) => {
           const element = document.getElementById(id);
@@ -129,6 +97,7 @@ function App() {
     window.addEventListener('resize', updateActiveSection);
 
     return () => {
+      window.clearTimeout(scrollTimerRef.current);
       window.removeEventListener('scroll', updateActiveSection);
       window.removeEventListener('resize', updateActiveSection);
     };
@@ -151,433 +120,39 @@ function App() {
       return;
     }
 
+    setIsScrolling(true);
     element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     window.history.pushState(null, '', `#${id}`);
     setActiveSection(id);
   }
 
+  const sectionProps = {
+    activeSection,
+    isScrolling,
+    shouldReduceMotion,
+  };
+
   return (
-    <div className="app-shell">
+    <div className="min-h-screen">
       <Header
         activeSection={activeSection}
         activeTheme={activeTheme}
+        navItems={reportData.navItems}
         onNavigate={handleNavigate}
         onThemeToggle={handleThemeToggle}
+        title={reportData.meta.title}
       />
-      <main>
-        <Hero activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
-        <OkrReview activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
-        <BusinessImpact activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
-        <KissReview activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
-        <PlanSection activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
-        <BattleItems activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
-        <Suggestions activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
+      <main className="mx-auto w-[min(1200px,calc(100%-32px))] py-7 pb-16 max-[820px]:w-[min(1200px,calc(100%-20px))] max-[820px]:pt-5">
+        <HeroSection {...sectionProps} />
+        <OkrReviewSection {...sectionProps} />
+        <BusinessImpactSection {...sectionProps} />
+        <KissReviewSection {...sectionProps} />
+        <PlanSection {...sectionProps} />
+        <BattleItemsSection {...sectionProps} />
+        <SuggestionsSection {...sectionProps} />
       </main>
       <BackToTop activeSection={activeSection} onNavigate={handleNavigate} />
     </div>
-  );
-}
-
-function Header({ activeSection, activeTheme, onNavigate, onThemeToggle }) {
-  const { Icon } = activeTheme;
-
-  return (
-    <header className="site-header">
-      <a
-        className="brand"
-        href={`#${HOME_SECTION_ID}`}
-        aria-label="回到首页"
-        onClick={(event) => {
-          event.preventDefault();
-          onNavigate(HOME_SECTION_ID);
-        }}
-      >
-        <img className="brand-logo" src={oneaixLogo} alt="ONEAIX 壹睿" />
-        <span className="brand-title">{reportData.meta.title}</span>
-      </a>
-      <div className="header-actions">
-        <nav className="site-nav" aria-label="汇报章节导航">
-          {reportData.navItems.map((item) => (
-            <a
-              aria-current={activeSection === item.id ? 'page' : undefined}
-              className={activeSection === item.id ? 'nav-link-active' : undefined}
-              href={`#${item.id}`}
-              key={item.id}
-              onClick={(event) => {
-                event.preventDefault();
-                onNavigate(item.id);
-              }}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-        <button
-          className="theme-toggle"
-          type="button"
-          onClick={onThemeToggle}
-          aria-label={`当前主题：${activeTheme.label}，点击切换`}
-          title={`当前主题：${activeTheme.label}`}
-        >
-          <Icon size={18} aria-hidden="true" />
-          <span>{activeTheme.label}</span>
-        </button>
-      </div>
-    </header>
-  );
-}
-
-function ReportSection({
-  activeSection,
-  children,
-  className = '',
-  id,
-  labelledBy,
-  shouldReduceMotion,
-}) {
-  const isActive = activeSection === id;
-  const motionState = shouldReduceMotion
-    ? { opacity: 1, filter: 'blur(0px) saturate(1)', scale: 1 }
-    : {
-        opacity: isActive ? 1 : 0.22,
-        filter: isActive ? 'blur(0px) saturate(1)' : 'blur(5px) saturate(0.78)',
-        scale: isActive ? 1 : 0.985,
-      };
-
-  return (
-    <motion.section
-      animate={motionState}
-      aria-labelledby={labelledBy}
-      className={`section-panel ${className}`}
-      id={id}
-      initial={false}
-      transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.section>
-  );
-}
-
-function Hero({ activeSection, shouldReduceMotion }) {
-  return (
-    <ReportSection
-      activeSection={activeSection}
-      className="hero-section"
-      id={HOME_SECTION_ID}
-      shouldReduceMotion={shouldReduceMotion}
-    >
-      <div className="hero-copy">
-        <p className="eyebrow">{reportData.meta.period}</p>
-        <h1>{reportData.meta.title}</h1>
-        <p className="hero-summary">{reportData.meta.summary}</p>
-      </div>
-      <div className="metric-grid" aria-label="核心指标">
-        {reportData.metrics.map((metric) => (
-          <MetricCard key={metric.label} metric={metric} />
-        ))}
-      </div>
-    </ReportSection>
-  );
-}
-
-function MetricCard({ metric }) {
-  return (
-    <article className="metric-card">
-      <span>{metric.label}</span>
-      <strong>{metric.value}</strong>
-      <p>{metric.description}</p>
-    </article>
-  );
-}
-
-function SectionTitle({ type, eyebrow, title, description, titleId }) {
-  const Icon = sectionIcons[type] ?? Target;
-
-  return (
-    <div className="section-title">
-      <div className="section-kicker">
-        <Icon size={18} aria-hidden="true" />
-        <span>{eyebrow}</span>
-      </div>
-      <h2 id={titleId}>{title}</h2>
-      {description ? <p>{description}</p> : null}
-    </div>
-  );
-}
-
-function OkrReview({ activeSection, shouldReduceMotion }) {
-  return (
-    <ReportSection
-      activeSection={activeSection}
-      id="okr"
-      labelledBy="okr-title"
-      shouldReduceMotion={shouldReduceMotion}
-    >
-      <SectionTitle
-        type="okr"
-        eyebrow="H1 Review"
-        title="OKR 完成情况"
-        titleId="okr-title"
-        description={reportData.okrSummary}
-      />
-      <div className="okr-layout">
-        {reportData.h1Okrs.map((okr) => (
-          <OkrCard key={okr.objective} okr={okr} />
-        ))}
-      </div>
-      <ChartBand />
-    </ReportSection>
-  );
-}
-
-function OkrCard({ okr }) {
-  return (
-    <article className="okr-card">
-      <div className="okr-card-header">
-        <div>
-          <p>{okr.code}</p>
-          <h3>{okr.objective}</h3>
-        </div>
-        <span className={statusClassName[okr.status]}>{okr.status}</span>
-      </div>
-      <p className="okr-note">{okr.note}</p>
-      <div className="kr-list">
-        {okr.krs.map((kr) => (
-          <div className="kr-row" key={kr.title}>
-            <div>
-              <strong>{kr.title}</strong>
-              <p>{kr.target}</p>
-            </div>
-            <span className={statusClassName[kr.status]}>{kr.status}</span>
-            <p>{kr.result}</p>
-          </div>
-        ))}
-      </div>
-    </article>
-  );
-}
-
-function ChartBand() {
-  return (
-    <div className="chart-band">
-      <article className="chart-card">
-        <h3>核心目标完成度</h3>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={reportData.completionChart}>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} />
-            <XAxis dataKey="name" tickLine={false} axisLine={false} />
-            <YAxis hide domain={[0, 120]} />
-            <Tooltip />
-            <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-              {reportData.completionChart.map((entry) => (
-                <Cell key={entry.name} fill={entry.color} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </article>
-      <article className="chart-card">
-        <h3>效率与质量趋势表达</h3>
-        <ResponsiveContainer width="100%" height={240}>
-          <AreaChart data={reportData.trendChart}>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} />
-            <XAxis dataKey="name" tickLine={false} axisLine={false} />
-            <YAxis hide />
-            <Tooltip />
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke="#2563eb"
-              fill="#dbeafe"
-              strokeWidth={2}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </article>
-    </div>
-  );
-}
-
-function BusinessImpact({ activeSection, shouldReduceMotion }) {
-  return (
-    <ReportSection
-      activeSection={activeSection}
-      id="impact"
-      labelledBy="impact-title"
-      shouldReduceMotion={shouldReduceMotion}
-    >
-      <SectionTitle
-        type="impact"
-        eyebrow="Business Impact"
-        title={reportData.businessImpact.title}
-        titleId="impact-title"
-        description={reportData.businessImpact.summary}
-      />
-      <div className="impact-grid">
-        {reportData.businessImpact.points.map((point) => (
-          <article className="impact-card" key={point.title}>
-            <CheckCircle2 size={20} aria-hidden="true" />
-            <h3>{point.title}</h3>
-            <p>{point.content}</p>
-          </article>
-        ))}
-      </div>
-      <blockquote>{reportData.businessImpact.conclusion}</blockquote>
-    </ReportSection>
-  );
-}
-
-function KissReview({ activeSection, shouldReduceMotion }) {
-  return (
-    <ReportSection
-      activeSection={activeSection}
-      id="kiss"
-      labelledBy="kiss-title"
-      shouldReduceMotion={shouldReduceMotion}
-    >
-      <SectionTitle
-        type="kiss"
-        eyebrow="KISS"
-        title="KISS 复盘"
-        titleId="kiss-title"
-        description="从继续保持、需要改进、开始尝试、停止减少四个角度沉淀 H1 经验。"
-      />
-      <div className="kiss-grid">
-        {reportData.kiss.map((item) => (
-          <article className="kiss-card" key={item.title}>
-            <span>{item.label}</span>
-            <h3>{item.title}</h3>
-            <ul>
-              {item.items.map((entry) => (
-                <li key={entry}>{entry}</li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </div>
-    </ReportSection>
-  );
-}
-
-function PlanSection({ activeSection, shouldReduceMotion }) {
-  return (
-    <ReportSection
-      activeSection={activeSection}
-      id="plan"
-      labelledBy="plan-title"
-      shouldReduceMotion={shouldReduceMotion}
-    >
-      <SectionTitle
-        type="plan"
-        eyebrow="H2 + Q3 Plan"
-        title="OKR 规划"
-        titleId="plan-title"
-        description={reportData.planSummary}
-      />
-      <div className="okr-layout">
-        {reportData.h2Okrs.map((okr) => (
-          <PlanCard key={okr.objective} okr={okr} />
-        ))}
-      </div>
-    </ReportSection>
-  );
-}
-
-function PlanCard({ okr }) {
-  return (
-    <article className="okr-card plan-card">
-      <div className="okr-card-header">
-        <div>
-          <p>{okr.code}</p>
-          <h3>{okr.objective}</h3>
-        </div>
-        <span className="status status-plan">规划</span>
-      </div>
-      <p className="okr-note">{okr.note}</p>
-      <div className="plan-kr-list">
-        {okr.krs.map((kr) => (
-          <div className="plan-kr" key={kr.title}>
-            <strong>{kr.title}</strong>
-            <p>{kr.description}</p>
-          </div>
-        ))}
-      </div>
-    </article>
-  );
-}
-
-function BattleItems({ activeSection, shouldReduceMotion }) {
-  return (
-    <ReportSection
-      activeSection={activeSection}
-      id="battles"
-      labelledBy="battles-title"
-      shouldReduceMotion={shouldReduceMotion}
-    >
-      <SectionTitle
-        type="battles"
-        eyebrow="Focus"
-        title="攻坚事项"
-        titleId="battles-title"
-        description="H2 重点攻坚不追求过度复杂，先把 AI 使用和自动化基础能力做实。"
-      />
-      <div className="focus-list">
-        {reportData.battleItems.map((item) => (
-          <article className="focus-card" key={item.title}>
-            <h3>{item.title}</h3>
-            <p>{item.value}</p>
-            <ol>
-              {item.steps.map((step) => (
-                <li key={step}>{step}</li>
-              ))}
-            </ol>
-          </article>
-        ))}
-      </div>
-    </ReportSection>
-  );
-}
-
-function Suggestions({ activeSection, shouldReduceMotion }) {
-  return (
-    <ReportSection
-      activeSection={activeSection}
-      id="suggestions"
-      labelledBy="suggestions-title"
-      shouldReduceMotion={shouldReduceMotion}
-    >
-      <SectionTitle
-        type="suggestions"
-        eyebrow="Suggestions"
-        title="个人建议"
-        titleId="suggestions-title"
-        description="围绕开发规范和团队知识流动，提出两点可持续推进的建议。"
-      />
-      <div className="suggestion-grid">
-        {reportData.suggestions.map((suggestion) => (
-          <article className="suggestion-card" key={suggestion.title}>
-            <h3>{suggestion.title}</h3>
-            <p>{suggestion.content}</p>
-          </article>
-        ))}
-      </div>
-    </ReportSection>
-  );
-}
-
-function BackToTop({ activeSection, onNavigate }) {
-  return (
-    <a
-      className={activeSection === HOME_SECTION_ID ? 'back-to-top is-hidden' : 'back-to-top'}
-      href={`#${HOME_SECTION_ID}`}
-      aria-label="返回顶部"
-      onClick={(event) => {
-        event.preventDefault();
-        onNavigate(HOME_SECTION_ID);
-      }}
-    >
-      <ArrowUp size={18} aria-hidden="true" />
-    </a>
   );
 }
 
