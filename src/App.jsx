@@ -26,8 +26,10 @@ import {
   YAxis,
 } from 'recharts';
 import { reportData } from './data/reportData.js';
+import oneaixLogo from './assets/oneaix-logo.png';
 
 const THEME_STORAGE_KEY = 'midyear-report-theme';
+const HOME_SECTION_ID = 'oneaix';
 
 const themeOptions = [
   { value: 'system', label: '跟随系统', Icon: Monitor },
@@ -55,10 +57,10 @@ function App() {
   const [theme, setTheme] = useState(() => {
     return window.localStorage.getItem(THEME_STORAGE_KEY) || 'system';
   });
-  const [activeSection, setActiveSection] = useState('hero');
+  const [activeSection, setActiveSection] = useState(HOME_SECTION_ID);
 
   const sectionIds = useMemo(() => {
-    return ['hero', ...reportData.navItems.map((item) => item.id)];
+    return [HOME_SECTION_ID, ...reportData.navItems.map((item) => item.id)];
   }, []);
 
   useEffect(() => {
@@ -105,7 +107,7 @@ function App() {
 
             return closest;
           },
-          { id: 'hero', distance: Number.POSITIVE_INFINITY },
+          { id: HOME_SECTION_ID, distance: Number.POSITIVE_INFINITY },
         ).id;
 
       setActiveSection((previousSection) => {
@@ -183,15 +185,15 @@ function Header({ activeSection, activeTheme, onNavigate, onThemeToggle }) {
     <header className="site-header">
       <a
         className="brand"
-        href="#hero"
+        href={`#${HOME_SECTION_ID}`}
         aria-label="回到首页"
         onClick={(event) => {
           event.preventDefault();
-          onNavigate('hero');
+          onNavigate(HOME_SECTION_ID);
         }}
       >
-        <span className="brand-mark">H1</span>
-        <span>{reportData.meta.title}</span>
+        <img className="brand-logo" src={oneaixLogo} alt="ONEAIX 壹睿" />
+        <span className="brand-title">{reportData.meta.title}</span>
       </a>
       <div className="header-actions">
         <nav className="site-nav" aria-label="汇报章节导航">
@@ -261,7 +263,7 @@ function Hero({ activeSection, shouldReduceMotion }) {
     <ReportSection
       activeSection={activeSection}
       className="hero-section"
-      id="hero"
+      id={HOME_SECTION_ID}
       shouldReduceMotion={shouldReduceMotion}
     >
       <div className="hero-copy">
@@ -566,12 +568,12 @@ function Suggestions({ activeSection, shouldReduceMotion }) {
 function BackToTop({ activeSection, onNavigate }) {
   return (
     <a
-      className={activeSection === 'hero' ? 'back-to-top is-hidden' : 'back-to-top'}
-      href="#hero"
+      className={activeSection === HOME_SECTION_ID ? 'back-to-top is-hidden' : 'back-to-top'}
+      href={`#${HOME_SECTION_ID}`}
       aria-label="返回顶部"
       onClick={(event) => {
         event.preventDefault();
-        onNavigate('hero');
+        onNavigate(HOME_SECTION_ID);
       }}
     >
       <ArrowUp size={18} aria-hidden="true" />
