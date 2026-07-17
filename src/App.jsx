@@ -128,7 +128,7 @@ function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell focus-${activeSection}`}>
       <Header
         activeSection={activeSection}
         activeTheme={activeTheme}
@@ -200,7 +200,7 @@ function Header({ activeSection, activeTheme, onNavigate, onThemeToggle }) {
 
 function Hero() {
   return (
-    <section className="hero-section section-panel" id="hero">
+    <section className="hero-section section-panel panel-hero" id="hero">
       <div className="hero-copy">
         <p className="eyebrow">{reportData.meta.period}</p>
         <h1>{reportData.meta.title}</h1>
@@ -242,7 +242,7 @@ function SectionTitle({ id, type, eyebrow, title, description }) {
 
 function OkrReview() {
   return (
-    <section className="section-panel" aria-labelledby="okr">
+    <section className="section-panel panel-okr" aria-labelledby="okr">
       <SectionTitle
         id="okr"
         type="okr"
@@ -330,7 +330,7 @@ function ChartBand() {
 
 function BusinessImpact() {
   return (
-    <section className="section-panel" aria-labelledby="impact">
+    <section className="section-panel panel-impact" aria-labelledby="impact">
       <SectionTitle
         id="impact"
         type="impact"
@@ -354,7 +354,7 @@ function BusinessImpact() {
 
 function KissReview() {
   return (
-    <section className="section-panel" aria-labelledby="kiss">
+    <section className="section-panel panel-kiss" aria-labelledby="kiss">
       <SectionTitle
         id="kiss"
         type="kiss"
@@ -381,7 +381,7 @@ function KissReview() {
 
 function PlanSection() {
   return (
-    <section className="section-panel" aria-labelledby="plan">
+    <section className="section-panel panel-plan" aria-labelledby="plan">
       <SectionTitle
         id="plan"
         type="plan"
@@ -423,7 +423,7 @@ function PlanCard({ okr }) {
 
 function BattleItems() {
   return (
-    <section className="section-panel" aria-labelledby="battles">
+    <section className="section-panel panel-battles" aria-labelledby="battles">
       <SectionTitle
         id="battles"
         type="battles"
@@ -450,7 +450,7 @@ function BattleItems() {
 
 function Suggestions() {
   return (
-    <section className="section-panel" aria-labelledby="suggestions">
+    <section className="section-panel panel-suggestions" aria-labelledby="suggestions">
       <SectionTitle
         id="suggestions"
         type="suggestions"
