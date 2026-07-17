@@ -25,7 +25,7 @@ export function ReportSection({
       animate={motionState}
       aria-labelledby={labelledBy}
       className={cn(
-        'mb-6 min-h-[calc(100vh-136px)] scroll-mt-[92px] rounded-lg border bg-[rgba(var(--surface-rgb),0.92)] p-7 shadow-[var(--shadow)] will-change-[opacity,transform] max-[820px]:min-h-0 max-[820px]:scroll-mt-[152px] max-[820px]:p-[22px_18px]',
+        'mb-6 min-h-[calc(100vh-136px)] rounded-lg border bg-[rgba(var(--surface-rgb),0.92)] p-7 shadow-[var(--shadow)] will-change-[opacity,transform] max-[820px]:min-h-0 max-[820px]:p-[22px_18px]',
         isActive ? 'border-[var(--brand)]' : 'border-[var(--line)]',
         className,
       )}

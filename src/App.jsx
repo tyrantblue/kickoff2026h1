@@ -39,6 +39,30 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
+    function updateSectionScrollOffset() {
+      const header = document.querySelector('header');
+      const main = document.querySelector('main');
+
+      if (!header || !main) {
+        return;
+      }
+
+      const headerHeight = header.getBoundingClientRect().height;
+      const mainPaddingTop = Number.parseFloat(window.getComputedStyle(main).paddingTop) || 0;
+      const scrollOffset = Math.round(headerHeight + mainPaddingTop);
+
+      document.documentElement.style.setProperty('--section-scroll-offset', `${scrollOffset}px`);
+    }
+
+    updateSectionScrollOffset();
+    window.addEventListener('resize', updateSectionScrollOffset);
+
+    return () => {
+      window.removeEventListener('resize', updateSectionScrollOffset);
+    };
+  }, []);
+
+  useEffect(() => {
     function updateActiveSection() {
       setIsScrolling(true);
       window.clearTimeout(scrollTimerRef.current);
