@@ -27,8 +27,6 @@ import {
 import { reportData } from './data/reportData.js';
 
 const THEME_STORAGE_KEY = 'midyear-report-theme';
-const HEADER_OFFSET = 112;
-
 const themeOptions = [
   { value: 'system', label: '跟随系统', Icon: Monitor },
   { value: 'light', label: '浅色', Icon: Sun },
@@ -75,11 +73,28 @@ function App() {
 
   useEffect(() => {
     function updateActiveSection() {
+      const viewportFocusY = window.innerHeight * 0.45;
       const currentSection =
-        sectionIds.findLast((id) => {
-          const element = document.getElementById(id);
-          return element && element.getBoundingClientRect().top <= HEADER_OFFSET;
-        }) ?? 'hero';
+        sectionIds.reduce(
+          (closest, id) => {
+            const element = document.getElementById(id);
+
+            if (!element) {
+              return closest;
+            }
+
+            const rect = element.getBoundingClientRect();
+            const sectionCenter = rect.top + rect.height / 2;
+            const distance = Math.abs(sectionCenter - viewportFocusY);
+
+            if (distance < closest.distance) {
+              return { id, distance };
+            }
+
+            return closest;
+          },
+          { id: 'hero', distance: Number.POSITIVE_INFINITY },
+        ).id ?? 'hero';
 
       setActiveSection((previousSection) => {
         if (previousSection === currentSection) {
