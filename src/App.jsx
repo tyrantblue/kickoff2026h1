@@ -74,27 +74,36 @@ function App() {
   useEffect(() => {
     function updateActiveSection() {
       const viewportFocusY = window.innerHeight * 0.45;
+      const sections = sectionIds
+        .map((id) => {
+          const element = document.getElementById(id);
+
+          if (!element) {
+            return null;
+          }
+
+          return { id, rect: element.getBoundingClientRect() };
+        })
+        .filter(Boolean);
+
+      const focusedSection = sections.find(({ rect }) => {
+        return rect.top <= viewportFocusY && rect.bottom >= viewportFocusY;
+      });
+
       const currentSection =
-        sectionIds.reduce(
-          (closest, id) => {
-            const element = document.getElementById(id);
-
-            if (!element) {
-              return closest;
-            }
-
-            const rect = element.getBoundingClientRect();
-            const sectionCenter = rect.top + rect.height / 2;
-            const distance = Math.abs(sectionCenter - viewportFocusY);
+        focusedSection?.id ??
+        sections.reduce(
+          (closest, section) => {
+            const distance = Math.abs(section.rect.top - viewportFocusY);
 
             if (distance < closest.distance) {
-              return { id, distance };
+              return { id: section.id, distance };
             }
 
             return closest;
           },
           { id: 'hero', distance: Number.POSITIVE_INFINITY },
-        ).id ?? 'hero';
+        ).id;
 
       setActiveSection((previousSection) => {
         if (previousSection === currentSection) {
