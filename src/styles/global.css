@@ -97,6 +97,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 112px;
 }
 
 body {
@@ -191,11 +192,17 @@ select {
 }
 
 .site-nav a:hover,
-.site-nav a:focus-visible {
+.site-nav a:focus-visible,
+.site-nav a.nav-link-active {
   background: var(--surface-muted);
   color: var(--brand);
   transform: translateY(-1px);
   outline: none;
+}
+
+.site-nav a.nav-link-active {
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.18);
+  font-weight: 700;
 }
 
 .theme-toggle {
@@ -247,6 +254,11 @@ main {
     border-color 220ms ease,
     box-shadow 220ms ease,
     transform 220ms ease;
+}
+
+.section-title,
+#hero {
+  scroll-margin-top: 112px;
 }
 
 .hero-section {
@@ -602,6 +614,12 @@ blockquote {
   outline: none;
 }
 
+.back-to-top.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -653,10 +671,19 @@ blockquote {
 }
 
 @media (max-width: 820px) {
+  html {
+    scroll-padding-top: 170px;
+  }
+
   .site-header {
     flex-direction: column;
     align-items: flex-start;
     padding: 18px 20px;
+  }
+
+  .section-title,
+  #hero {
+    scroll-margin-top: 170px;
   }
 
   .site-nav {

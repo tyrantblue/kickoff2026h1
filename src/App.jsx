@@ -27,6 +27,7 @@ import {
 import { reportData } from './data/reportData.js';
 
 const THEME_STORAGE_KEY = 'midyear-report-theme';
+const HEADER_OFFSET = 112;
 
 const themeOptions = [
   { value: 'system', label: '跟随系统', Icon: Monitor },
@@ -53,6 +54,11 @@ function App() {
   const [theme, setTheme] = useState(() => {
     return window.localStorage.getItem(THEME_STORAGE_KEY) || 'system';
   });
+  const [activeSection, setActiveSection] = useState('hero');
+
+  const sectionIds = useMemo(() => {
+    return ['hero', ...reportData.navItems.map((item) => item.id)];
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -67,6 +73,38 @@ function App() {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
 
+  useEffect(() => {
+    function updateActiveSection() {
+      const currentSection =
+        sectionIds.findLast((id) => {
+          const element = document.getElementById(id);
+          return element && element.getBoundingClientRect().top <= HEADER_OFFSET;
+        }) ?? 'hero';
+
+      setActiveSection((previousSection) => {
+        if (previousSection === currentSection) {
+          return previousSection;
+        }
+
+        const nextHash = `#${currentSection}`;
+        if (window.location.hash !== nextHash) {
+          window.history.replaceState(null, '', nextHash);
+        }
+
+        return currentSection;
+      });
+    }
+
+    updateActiveSection();
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
+    window.addEventListener('resize', updateActiveSection);
+
+    return () => {
+      window.removeEventListener('scroll', updateActiveSection);
+      window.removeEventListener('resize', updateActiveSection);
+    };
+  }, [sectionIds]);
+
   const activeTheme = useMemo(() => {
     return themeOptions.find((option) => option.value === theme) ?? themeOptions[0];
   }, [theme]);
@@ -77,9 +115,26 @@ function App() {
     setTheme(themeOptions[nextIndex].value);
   }
 
+  function handleNavigate(id) {
+    const element = document.getElementById(id);
+
+    if (!element) {
+      return;
+    }
+
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.history.pushState(null, '', `#${id}`);
+    setActiveSection(id);
+  }
+
   return (
     <div className="app-shell">
-      <Header activeTheme={activeTheme} onThemeToggle={handleThemeToggle} />
+      <Header
+        activeSection={activeSection}
+        activeTheme={activeTheme}
+        onNavigate={handleNavigate}
+        onThemeToggle={handleThemeToggle}
+      />
       <main>
         <Hero />
         <OkrReview />
@@ -89,24 +144,41 @@ function App() {
         <BattleItems />
         <Suggestions />
       </main>
-      <BackToTop />
+      <BackToTop activeSection={activeSection} onNavigate={handleNavigate} />
     </div>
   );
 }
 
-function Header({ activeTheme, onThemeToggle }) {
+function Header({ activeSection, activeTheme, onNavigate, onThemeToggle }) {
   const { Icon } = activeTheme;
 
   return (
     <header className="site-header">
-      <a className="brand" href="#hero" aria-label="回到首页">
+      <a
+        className="brand"
+        href="#hero"
+        aria-label="回到首页"
+        onClick={(event) => {
+          event.preventDefault();
+          onNavigate('hero');
+        }}
+      >
         <span className="brand-mark">H1</span>
         <span>{reportData.meta.title}</span>
       </a>
       <div className="header-actions">
         <nav className="site-nav" aria-label="汇报章节导航">
           {reportData.navItems.map((item) => (
-            <a key={item.id} href={`#${item.id}`}>
+            <a
+              aria-current={activeSection === item.id ? 'page' : undefined}
+              className={activeSection === item.id ? 'nav-link-active' : undefined}
+              href={`#${item.id}`}
+              key={item.id}
+              onClick={(event) => {
+                event.preventDefault();
+                onNavigate(item.id);
+              }}
+            >
               {item.label}
             </a>
           ))}
@@ -398,9 +470,17 @@ function Suggestions() {
   );
 }
 
-function BackToTop() {
+function BackToTop({ activeSection, onNavigate }) {
   return (
-    <a className="back-to-top" href="#hero" aria-label="返回顶部">
+    <a
+      className={activeSection === 'hero' ? 'back-to-top is-hidden' : 'back-to-top'}
+      href="#hero"
+      aria-label="返回顶部"
+      onClick={(event) => {
+        event.preventDefault();
+        onNavigate('hero');
+      }}
+    >
       <ArrowUp size={18} aria-hidden="true" />
     </a>
   );
