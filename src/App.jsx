@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowUp,
   BarChart3,
@@ -27,6 +28,7 @@ import {
 import { reportData } from './data/reportData.js';
 
 const THEME_STORAGE_KEY = 'midyear-report-theme';
+
 const themeOptions = [
   { value: 'system', label: '跟随系统', Icon: Monitor },
   { value: 'light', label: '浅色', Icon: Sun },
@@ -49,6 +51,7 @@ const sectionIcons = {
 };
 
 function App() {
+  const shouldReduceMotion = useReducedMotion();
   const [theme, setTheme] = useState(() => {
     return window.localStorage.getItem(THEME_STORAGE_KEY) || 'system';
   });
@@ -152,7 +155,7 @@ function App() {
   }
 
   return (
-    <div className={`app-shell focus-${activeSection}`}>
+    <div className="app-shell">
       <Header
         activeSection={activeSection}
         activeTheme={activeTheme}
@@ -160,13 +163,13 @@ function App() {
         onThemeToggle={handleThemeToggle}
       />
       <main>
-        <Hero />
-        <OkrReview />
-        <BusinessImpact />
-        <KissReview />
-        <PlanSection />
-        <BattleItems />
-        <Suggestions />
+        <Hero activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
+        <OkrReview activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
+        <BusinessImpact activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
+        <KissReview activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
+        <PlanSection activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
+        <BattleItems activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
+        <Suggestions activeSection={activeSection} shouldReduceMotion={shouldReduceMotion} />
       </main>
       <BackToTop activeSection={activeSection} onNavigate={handleNavigate} />
     </div>
@@ -222,9 +225,45 @@ function Header({ activeSection, activeTheme, onNavigate, onThemeToggle }) {
   );
 }
 
-function Hero() {
+function ReportSection({
+  activeSection,
+  children,
+  className = '',
+  id,
+  labelledBy,
+  shouldReduceMotion,
+}) {
+  const isActive = activeSection === id;
+  const motionState = shouldReduceMotion
+    ? { opacity: 1, filter: 'blur(0px) saturate(1)', scale: 1 }
+    : {
+        opacity: isActive ? 1 : 0.22,
+        filter: isActive ? 'blur(0px) saturate(1)' : 'blur(5px) saturate(0.78)',
+        scale: isActive ? 1 : 0.985,
+      };
+
   return (
-    <section className="hero-section section-panel panel-hero" id="hero">
+    <motion.section
+      animate={motionState}
+      aria-labelledby={labelledBy}
+      className={`section-panel ${className}`}
+      id={id}
+      initial={false}
+      transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.section>
+  );
+}
+
+function Hero({ activeSection, shouldReduceMotion }) {
+  return (
+    <ReportSection
+      activeSection={activeSection}
+      className="hero-section"
+      id="hero"
+      shouldReduceMotion={shouldReduceMotion}
+    >
       <div className="hero-copy">
         <p className="eyebrow">{reportData.meta.period}</p>
         <h1>{reportData.meta.title}</h1>
@@ -235,7 +274,7 @@ function Hero() {
           <MetricCard key={metric.label} metric={metric} />
         ))}
       </div>
-    </section>
+    </ReportSection>
   );
 }
 
@@ -249,29 +288,34 @@ function MetricCard({ metric }) {
   );
 }
 
-function SectionTitle({ id, type, eyebrow, title, description }) {
+function SectionTitle({ type, eyebrow, title, description, titleId }) {
   const Icon = sectionIcons[type] ?? Target;
 
   return (
-    <div className="section-title" id={id}>
+    <div className="section-title">
       <div className="section-kicker">
         <Icon size={18} aria-hidden="true" />
         <span>{eyebrow}</span>
       </div>
-      <h2>{title}</h2>
+      <h2 id={titleId}>{title}</h2>
       {description ? <p>{description}</p> : null}
     </div>
   );
 }
 
-function OkrReview() {
+function OkrReview({ activeSection, shouldReduceMotion }) {
   return (
-    <section className="section-panel panel-okr" aria-labelledby="okr">
+    <ReportSection
+      activeSection={activeSection}
+      id="okr"
+      labelledBy="okr-title"
+      shouldReduceMotion={shouldReduceMotion}
+    >
       <SectionTitle
-        id="okr"
         type="okr"
         eyebrow="H1 Review"
         title="OKR 完成情况"
+        titleId="okr-title"
         description={reportData.okrSummary}
       />
       <div className="okr-layout">
@@ -280,7 +324,7 @@ function OkrReview() {
         ))}
       </div>
       <ChartBand />
-    </section>
+    </ReportSection>
   );
 }
 
@@ -352,14 +396,19 @@ function ChartBand() {
   );
 }
 
-function BusinessImpact() {
+function BusinessImpact({ activeSection, shouldReduceMotion }) {
   return (
-    <section className="section-panel panel-impact" aria-labelledby="impact">
+    <ReportSection
+      activeSection={activeSection}
+      id="impact"
+      labelledBy="impact-title"
+      shouldReduceMotion={shouldReduceMotion}
+    >
       <SectionTitle
-        id="impact"
         type="impact"
         eyebrow="Business Impact"
         title={reportData.businessImpact.title}
+        titleId="impact-title"
         description={reportData.businessImpact.summary}
       />
       <div className="impact-grid">
@@ -372,18 +421,23 @@ function BusinessImpact() {
         ))}
       </div>
       <blockquote>{reportData.businessImpact.conclusion}</blockquote>
-    </section>
+    </ReportSection>
   );
 }
 
-function KissReview() {
+function KissReview({ activeSection, shouldReduceMotion }) {
   return (
-    <section className="section-panel panel-kiss" aria-labelledby="kiss">
+    <ReportSection
+      activeSection={activeSection}
+      id="kiss"
+      labelledBy="kiss-title"
+      shouldReduceMotion={shouldReduceMotion}
+    >
       <SectionTitle
-        id="kiss"
         type="kiss"
         eyebrow="KISS"
         title="KISS 复盘"
+        titleId="kiss-title"
         description="从继续保持、需要改进、开始尝试、停止减少四个角度沉淀 H1 经验。"
       />
       <div className="kiss-grid">
@@ -399,18 +453,23 @@ function KissReview() {
           </article>
         ))}
       </div>
-    </section>
+    </ReportSection>
   );
 }
 
-function PlanSection() {
+function PlanSection({ activeSection, shouldReduceMotion }) {
   return (
-    <section className="section-panel panel-plan" aria-labelledby="plan">
+    <ReportSection
+      activeSection={activeSection}
+      id="plan"
+      labelledBy="plan-title"
+      shouldReduceMotion={shouldReduceMotion}
+    >
       <SectionTitle
-        id="plan"
         type="plan"
         eyebrow="H2 + Q3 Plan"
         title="OKR 规划"
+        titleId="plan-title"
         description={reportData.planSummary}
       />
       <div className="okr-layout">
@@ -418,7 +477,7 @@ function PlanSection() {
           <PlanCard key={okr.objective} okr={okr} />
         ))}
       </div>
-    </section>
+    </ReportSection>
   );
 }
 
@@ -445,14 +504,19 @@ function PlanCard({ okr }) {
   );
 }
 
-function BattleItems() {
+function BattleItems({ activeSection, shouldReduceMotion }) {
   return (
-    <section className="section-panel panel-battles" aria-labelledby="battles">
+    <ReportSection
+      activeSection={activeSection}
+      id="battles"
+      labelledBy="battles-title"
+      shouldReduceMotion={shouldReduceMotion}
+    >
       <SectionTitle
-        id="battles"
         type="battles"
         eyebrow="Focus"
         title="攻坚事项"
+        titleId="battles-title"
         description="H2 重点攻坚不追求过度复杂，先把 AI 使用和自动化基础能力做实。"
       />
       <div className="focus-list">
@@ -468,18 +532,23 @@ function BattleItems() {
           </article>
         ))}
       </div>
-    </section>
+    </ReportSection>
   );
 }
 
-function Suggestions() {
+function Suggestions({ activeSection, shouldReduceMotion }) {
   return (
-    <section className="section-panel panel-suggestions" aria-labelledby="suggestions">
+    <ReportSection
+      activeSection={activeSection}
+      id="suggestions"
+      labelledBy="suggestions-title"
+      shouldReduceMotion={shouldReduceMotion}
+    >
       <SectionTitle
-        id="suggestions"
         type="suggestions"
         eyebrow="Suggestions"
         title="个人建议"
+        titleId="suggestions-title"
         description="围绕开发规范和团队知识流动，提出两点可持续推进的建议。"
       />
       <div className="suggestion-grid">
@@ -490,7 +559,7 @@ function Suggestions() {
           </article>
         ))}
       </div>
-    </section>
+    </ReportSection>
   );
 }
 
