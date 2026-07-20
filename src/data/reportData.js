@@ -2,7 +2,7 @@ export const reportData = {
   meta: {
     title: '2026 H1 年中汇报',
     period: '2026 H1 / H2 + Q3 Plan',
-    summary: '高效稳定交付，支撑业务持续运转。',
+    summary: '以客为先，以智为驱，以终为始，以人为本。',
   },
   navItems: [
     { id: 'okr', label: 'H1 OKR' },
