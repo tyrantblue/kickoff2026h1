@@ -5,6 +5,8 @@ import { SectionTitle } from '../components/SectionTitle.jsx';
 import { reportData } from '../data/reportData.js';
 
 export function PlanSection({ activeSection, isScrolling, shouldReduceMotion }) {
+  const maxKrs = Math.max(...reportData.h2Okrs.map((okr) => okr.krs.length));
+
   return (
     <ReportSection
       activeSection={activeSection}
@@ -20,9 +22,9 @@ export function PlanSection({ activeSection, isScrolling, shouldReduceMotion }) 
         titleId="plan-title"
         description={reportData.planSummary}
       />
-      <div className="grid grid-cols-3 gap-[18px] max-[1100px]:grid-cols-1">
+      <div className="grid items-stretch grid-cols-3 gap-[18px] max-[1100px]:grid-cols-1">
         {reportData.h2Okrs.map((okr) => (
-          <PlanCard key={okr.objective} okr={okr} />
+          <PlanCard key={okr.objective} maxKrs={maxKrs} okr={okr} />
         ))}
       </div>
     </ReportSection>

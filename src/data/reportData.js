@@ -117,7 +117,7 @@ export const reportData = {
     { name: '成长', value: 71 },
   ],
   businessImpact: {
-    title: 'H1 对业务结果最有帮助的事情',
+    title: '业务结果',
     summary:
       '在高工单量和持续模块交付的情况下，保持了较好的响应效率、交付质量和业务支撑稳定性。',
     points: [
