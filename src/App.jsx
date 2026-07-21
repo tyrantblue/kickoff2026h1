@@ -54,6 +54,7 @@ function applyThemeTokens(theme, palette) {
 function App() {
   const shouldReduceMotion = useReducedMotion();
   const scrollTimerRef = useRef(null);
+  const [systemTheme, setSystemTheme] = useState(() => getResolvedTheme('system'));
   const [theme, setTheme] = useState(() => {
     return window.localStorage.getItem(THEME_STORAGE_KEY) || 'system';
   });
@@ -74,6 +75,23 @@ function App() {
   const activePalette = useMemo(() => {
     return reportPalettes.find((palette) => palette.id === paletteId) ?? reportPalettes[0];
   }, [paletteId]);
+
+  const resolvedTheme = theme === 'system' ? systemTheme : theme;
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function updateSystemTheme() {
+      setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
+    }
+
+    updateSystemTheme();
+    mediaQuery.addEventListener('change', updateSystemTheme);
+
+    return () => {
+      mediaQuery.removeEventListener('change', updateSystemTheme);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     applyThemeTokens(theme, activePalette);
@@ -240,6 +258,7 @@ function App() {
         onPaletteChange={handlePaletteChange}
         onThemeToggle={handleThemeToggle}
         palettes={reportPalettes}
+        resolvedTheme={resolvedTheme}
         title={reportData.meta.title}
       />
       <main className="mx-auto w-[min(1200px,calc(100%-32px))] py-7 pb-16 max-[820px]:w-[min(1200px,calc(100%-20px))] max-[820px]:pt-5">

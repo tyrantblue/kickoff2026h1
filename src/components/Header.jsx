@@ -3,6 +3,7 @@ import { HOME_SECTION_ID } from '../constants/ui.js';
 import { PaletteSwitcher } from './PaletteSwitcher.jsx';
 import { cn } from '../utils/cn.js';
 import oneaixLogo from '../assets/oneaix-logo.png';
+import oneaixLogoDark from '../assets/oneaix-logo-dark.png';
 
 export function Header({
   activePalette,
@@ -13,9 +14,11 @@ export function Header({
   onPaletteChange,
   onThemeToggle,
   palettes,
+  resolvedTheme,
   title,
 }) {
   const { Icon } = activeTheme;
+  const logoSrc = resolvedTheme === 'dark' ? oneaixLogoDark : oneaixLogo;
 
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between gap-6 border-b border-[var(--line)] bg-[rgba(var(--header-rgb),0.88)] px-8 py-[18px] backdrop-blur-2xl transition-colors max-[820px]:flex-col max-[820px]:items-start max-[820px]:px-5">
@@ -30,7 +33,7 @@ export function Header({
       >
         <img
           className="block h-[34px] w-[min(210px,34vw)] object-contain max-[820px]:h-7 max-[820px]:w-[min(170px,56vw)]"
-          src={oneaixLogo}
+          src={logoSrc}
           alt="ONEAIX 壹睿"
         />
         <span className="whitespace-nowrap text-[15px] text-[var(--text)] max-[820px]:text-sm">
