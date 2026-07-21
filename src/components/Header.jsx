@@ -1,9 +1,20 @@
 import React from 'react';
 import { HOME_SECTION_ID } from '../constants/ui.js';
+import { PaletteSwitcher } from './PaletteSwitcher.jsx';
 import { cn } from '../utils/cn.js';
 import oneaixLogo from '../assets/oneaix-logo.png';
 
-export function Header({ activeSection, activeTheme, navItems, onNavigate, onThemeToggle, title }) {
+export function Header({
+  activePalette,
+  activeSection,
+  activeTheme,
+  navItems,
+  onNavigate,
+  onPaletteChange,
+  onThemeToggle,
+  palettes,
+  title,
+}) {
   const { Icon } = activeTheme;
 
   return (
@@ -60,6 +71,11 @@ export function Header({ activeSection, activeTheme, navItems, onNavigate, onThe
           <Icon size={18} aria-hidden="true" />
           <span>{activeTheme.label}</span>
         </button>
+        <PaletteSwitcher
+          activePalette={activePalette}
+          onPaletteChange={onPaletteChange}
+          palettes={palettes}
+        />
       </div>
     </header>
   );

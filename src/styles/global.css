@@ -27,6 +27,11 @@
   --route-line: rgba(26, 106, 150, 0.32);
   --section-wash-a: rgba(26, 106, 150, 0.08);
   --section-wash-b: rgba(124, 156, 168, 0.12);
+  --page-glow-a: rgba(26, 106, 150, 0.14);
+  --page-glow-b: rgba(124, 156, 168, 0.16);
+  --chart-1: #1a6a96;
+  --chart-2: #7c9ca8;
+  --chart-3: #1f5360;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -55,6 +60,11 @@
     --route-line: rgba(124, 156, 168, 0.34);
     --section-wash-a: rgba(124, 156, 168, 0.1);
     --section-wash-b: rgba(210, 209, 196, 0.08);
+    --page-glow-a: rgba(124, 156, 168, 0.13);
+    --page-glow-b: rgba(210, 209, 196, 0.1);
+    --chart-1: #7c9ca8;
+    --chart-2: #d2d1c4;
+    --chart-3: #1a6a96;
   }
 }
 
@@ -83,6 +93,11 @@
   --route-line: rgba(26, 106, 150, 0.32);
   --section-wash-a: rgba(26, 106, 150, 0.08);
   --section-wash-b: rgba(124, 156, 168, 0.12);
+  --page-glow-a: rgba(26, 106, 150, 0.14);
+  --page-glow-b: rgba(124, 156, 168, 0.16);
+  --chart-1: #1a6a96;
+  --chart-2: #7c9ca8;
+  --chart-3: #1f5360;
 }
 
 :root[data-theme="dark"] {
@@ -110,6 +125,11 @@
   --route-line: rgba(124, 156, 168, 0.34);
   --section-wash-a: rgba(124, 156, 168, 0.1);
   --section-wash-b: rgba(210, 209, 196, 0.08);
+  --page-glow-a: rgba(124, 156, 168, 0.13);
+  --page-glow-b: rgba(210, 209, 196, 0.1);
+  --chart-1: #7c9ca8;
+  --chart-2: #d2d1c4;
+  --chart-3: #1a6a96;
 }
 
 html {
@@ -122,8 +142,8 @@ body {
   background:
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 48px 48px,
     linear-gradient(180deg, var(--grid-line) 1px, transparent 1px) 0 0 / 48px 48px,
-    radial-gradient(circle at 18% 8%, rgba(26, 106, 150, 0.14), transparent 28%),
-    radial-gradient(circle at 82% 0%, rgba(124, 156, 168, 0.16), transparent 24%),
+    radial-gradient(circle at 18% 8%, var(--page-glow-a), transparent 28%),
+    radial-gradient(circle at 82% 0%, var(--page-glow-b), transparent 24%),
     linear-gradient(180deg, var(--page-start) 0%, var(--page-end) 100%);
   color: var(--text);
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;

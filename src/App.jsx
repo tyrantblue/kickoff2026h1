@@ -1,8 +1,14 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { BackToTop } from './components/BackToTop.jsx';
 import { Header } from './components/Header.jsx';
-import { HOME_SECTION_ID, THEME_STORAGE_KEY, themeOptions } from './constants/ui.js';
+import {
+  HOME_SECTION_ID,
+  PALETTE_STORAGE_KEY,
+  THEME_STORAGE_KEY,
+  reportPalettes,
+  themeOptions,
+} from './constants/ui.js';
 import { reportData } from './data/reportData.js';
 import { BattleItemsSection } from './sections/BattleItemsSection.jsx';
 import { BusinessImpactSection } from './sections/BusinessImpactSection.jsx';
@@ -12,11 +18,47 @@ import { OkrReviewSection } from './sections/OkrReviewSection.jsx';
 import { PlanSection } from './sections/PlanSection.jsx';
 import { SuggestionsSection } from './sections/SuggestionsSection.jsx';
 
+function getResolvedTheme(theme) {
+  if (theme !== 'system') {
+    return theme;
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyPaletteTokens(theme, palette) {
+  const root = document.documentElement;
+  const values = getResolvedTheme(theme) === 'dark' ? palette.dark : palette.light;
+
+  Object.entries(values).forEach(([key, value]) => {
+    const cssName = key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+    root.style.setProperty(`--${cssName}`, value);
+  });
+}
+
+function applyThemeTokens(theme, palette) {
+  const root = document.documentElement;
+
+  if (theme === 'system') {
+    root.removeAttribute('data-theme');
+    window.localStorage.removeItem(THEME_STORAGE_KEY);
+  } else {
+    root.setAttribute('data-theme', theme);
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }
+
+  root.style.colorScheme = getResolvedTheme(theme);
+  applyPaletteTokens(theme, palette);
+}
+
 function App() {
   const shouldReduceMotion = useReducedMotion();
   const scrollTimerRef = useRef(null);
   const [theme, setTheme] = useState(() => {
     return window.localStorage.getItem(THEME_STORAGE_KEY) || 'system';
+  });
+  const [paletteId, setPaletteId] = useState(() => {
+    return window.localStorage.getItem(PALETTE_STORAGE_KEY) || reportPalettes[0].id;
   });
   const [activeSection, setActiveSection] = useState(HOME_SECTION_ID);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -25,18 +67,41 @@ function App() {
     return [HOME_SECTION_ID, ...reportData.navItems.map((item) => item.id)];
   }, []);
 
-  useEffect(() => {
-    const root = document.documentElement;
+  const activeTheme = useMemo(() => {
+    return themeOptions.find((option) => option.value === theme) ?? themeOptions[0];
+  }, [theme]);
 
-    if (theme === 'system') {
-      root.removeAttribute('data-theme');
-      window.localStorage.removeItem(THEME_STORAGE_KEY);
-      return;
+  const activePalette = useMemo(() => {
+    return reportPalettes.find((palette) => palette.id === paletteId) ?? reportPalettes[0];
+  }, [paletteId]);
+
+  useLayoutEffect(() => {
+    applyThemeTokens(theme, activePalette);
+  }, [activePalette, theme]);
+
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function applyPalette() {
+      root.style.colorScheme = getResolvedTheme(theme);
+      applyPaletteTokens(theme, activePalette);
     }
 
-    root.setAttribute('data-theme', theme);
-    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
-  }, [theme]);
+    root.setAttribute('data-palette', activePalette.id);
+    window.localStorage.setItem(PALETTE_STORAGE_KEY, activePalette.id);
+    applyPalette();
+
+    if (theme !== 'system') {
+      return undefined;
+    }
+
+    mediaQuery.addEventListener('change', applyPalette);
+
+    return () => {
+      mediaQuery.removeEventListener('change', applyPalette);
+    };
+  }, [activePalette, theme]);
 
   useEffect(() => {
     function updateSectionScrollOffset() {
@@ -127,14 +192,22 @@ function App() {
     };
   }, [sectionIds]);
 
-  const activeTheme = useMemo(() => {
-    return themeOptions.find((option) => option.value === theme) ?? themeOptions[0];
-  }, [theme]);
-
   function handleThemeToggle() {
     const currentIndex = themeOptions.findIndex((option) => option.value === theme);
     const nextIndex = (currentIndex + 1) % themeOptions.length;
-    setTheme(themeOptions[nextIndex].value);
+    const nextTheme = themeOptions[nextIndex].value;
+
+    applyThemeTokens(nextTheme, activePalette);
+    setTheme(nextTheme);
+  }
+
+  function handlePaletteChange(nextPaletteId) {
+    const nextPalette = reportPalettes.find((palette) => palette.id === nextPaletteId) ?? reportPalettes[0];
+
+    document.documentElement.setAttribute('data-palette', nextPalette.id);
+    window.localStorage.setItem(PALETTE_STORAGE_KEY, nextPalette.id);
+    applyPaletteTokens(theme, nextPalette);
+    setPaletteId(nextPalette.id);
   }
 
   function handleNavigate(id) {
@@ -160,10 +233,13 @@ function App() {
     <div className="min-h-screen">
       <Header
         activeSection={activeSection}
+        activePalette={activePalette}
         activeTheme={activeTheme}
         navItems={reportData.navItems}
         onNavigate={handleNavigate}
+        onPaletteChange={handlePaletteChange}
         onThemeToggle={handleThemeToggle}
+        palettes={reportPalettes}
         title={reportData.meta.title}
       />
       <main className="mx-auto w-[min(1200px,calc(100%-32px))] py-7 pb-16 max-[820px]:w-[min(1200px,calc(100%-20px))] max-[820px]:pt-5">

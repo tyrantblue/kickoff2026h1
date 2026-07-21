@@ -15,18 +15,23 @@ import { reportData } from '../data/reportData.js';
 import { chartAxisStyle } from '../constants/ui.js';
 
 export function ChartBand() {
+  const completionData = reportData.completionChart.map((entry, index) => ({
+    ...entry,
+    color: `var(--chart-${index + 1})`,
+  }));
+
   return (
     <div className="relative z-10 mt-[18px] grid grid-cols-2 gap-[18px] max-[1100px]:grid-cols-1">
       <article className="border border-[var(--line)] bg-[var(--surface)] p-[18px] transition hover:-translate-y-1 hover:border-[var(--brand)] hover:shadow-[var(--shadow)]">
         <h3 className="mb-3 text-[22px] leading-[1.3]">核心目标完成度</h3>
         <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={reportData.completionChart} margin={{ top: 8, right: 18, bottom: 8, left: 18 }}>
+          <BarChart data={completionData} margin={{ top: 8, right: 18, bottom: 8, left: 18 }}>
             <CartesianGrid stroke="var(--line)" strokeDasharray="4 4" vertical={false} />
             <XAxis dataKey="name" tick={chartAxisStyle} tickLine={false} axisLine={false} />
             <YAxis hide domain={[0, 120]} />
             <Tooltip />
             <Bar dataKey="value" radius={[2, 2, 0, 0]}>
-              {reportData.completionChart.map((entry) => (
+              {completionData.map((entry) => (
                 <Cell key={entry.name} fill={entry.color} />
               ))}
             </Bar>
