@@ -18,11 +18,12 @@ export function PlanSection({ activeSection, isScrolling, shouldReduceMotion }) 
       <SectionTitle
         type="plan"
         eyebrow="H2 + Q3 Plan"
+        index="04"
         title="OKR 规划"
         titleId="plan-title"
         description={reportData.planSummary}
       />
-      <div className="grid items-stretch grid-cols-3 gap-[18px] max-[1100px]:grid-cols-1">
+      <div className="relative z-10 grid items-stretch grid-cols-3 gap-[18px] max-[1100px]:grid-cols-1">
         {reportData.h2Okrs.map((okr) => (
           <PlanCard key={okr.objective} maxKrs={maxKrs} okr={okr} />
         ))}

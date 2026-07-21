@@ -106,9 +106,9 @@ export const reportData = {
     },
   ],
   completionChart: [
-    { name: 'O1', value: 102.1, color: '#2563eb' },
-    { name: 'O2', value: 100, color: '#14b8a6' },
-    { name: 'O3', value: 66, color: '#f59e0b' },
+    { name: 'O1', value: 102.1, color: '#1a6a96' },
+    { name: 'O2', value: 100, color: '#7c9ca8' },
+    { name: 'O3', value: 66, color: '#1f5360' },
   ],
   trendChart: [
     { name: '效率', value: 92 },

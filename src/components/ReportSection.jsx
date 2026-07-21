@@ -25,7 +25,7 @@ export function ReportSection({
       animate={motionState}
       aria-labelledby={labelledBy}
       className={cn(
-        'mb-6 min-h-[calc(100vh-136px)] rounded-lg border bg-[rgba(var(--surface-rgb),0.92)] p-7 shadow-[var(--shadow)] will-change-[opacity,transform] max-[820px]:min-h-0 max-[820px]:p-[22px_18px]',
+        'relative mb-6 min-h-[calc(100vh-136px)] overflow-hidden rounded-[2px] border bg-[rgba(var(--surface-rgb),0.9)] p-7 shadow-[var(--shadow)] backdrop-blur-sm will-change-[opacity,transform] before:absolute before:left-0 before:top-0 before:h-full before:w-[5px] before:bg-[var(--brand)] after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(135deg,var(--section-wash-a),transparent_26%,transparent_74%,var(--section-wash-b))] max-[820px]:min-h-0 max-[820px]:p-[22px_18px]',
         isActive ? 'border-[var(--brand)]' : 'border-[var(--line)]',
         className,
       )}

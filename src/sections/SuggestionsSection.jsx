@@ -15,14 +15,15 @@ export function SuggestionsSection({ activeSection, isScrolling, shouldReduceMot
       <SectionTitle
         type="suggestions"
         eyebrow="Suggestions"
+        index="06"
         title="个人建议"
         titleId="suggestions-title"
         description="围绕开发规范和团队知识流动，提出两点可持续推进的建议。"
       />
-      <div className="grid grid-cols-2 gap-[18px] max-[1100px]:grid-cols-1">
+      <div className="relative z-10 grid grid-cols-2 gap-[18px] max-[1100px]:grid-cols-1">
         {reportData.suggestions.map((suggestion) => (
           <article
-            className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-[22px] transition hover:-translate-y-1 hover:shadow-[0_16px_30px_rgba(15,23,42,0.1)]"
+            className="border border-[var(--line)] bg-[var(--surface)] p-[22px] transition hover:-translate-y-1 hover:border-[var(--brand)] hover:shadow-[var(--shadow)]"
             key={suggestion.title}
           >
             <h3 className="text-[22px] leading-[1.3]">{suggestion.title}</h3>

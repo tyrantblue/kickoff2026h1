@@ -19,11 +19,12 @@ export function OkrReviewSection({ activeSection, isScrolling, shouldReduceMotio
       <SectionTitle
         type="okr"
         eyebrow="H1 Review"
+        index="01"
         title="OKR 完成情况"
         titleId="okr-title"
         description={reportData.okrSummary}
       />
-      <div className="grid items-stretch grid-cols-3 gap-[18px] max-[1100px]:grid-cols-1">
+      <div className="relative z-10 grid items-stretch grid-cols-3 gap-[18px] max-[1100px]:grid-cols-1">
         {reportData.h1Okrs.map((okr) => (
           <OkrCard key={okr.objective} maxKrs={maxKrs} okr={okr} />
         ))}

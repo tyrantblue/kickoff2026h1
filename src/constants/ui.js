@@ -35,16 +35,16 @@ export const chartAxisStyle = {
 
 export function getStatusClassName(status) {
   if (status?.includes('\u5df2\u5b8c\u6210')) {
-    return 'bg-teal-500/15 text-teal-700 dark:text-teal-300';
+    return 'bg-[color-mix(in_srgb,var(--brand)_16%,transparent)] text-[var(--brand-strong)]';
   }
 
   if (status?.includes('\u90e8\u5206')) {
-    return 'bg-amber-500/15 text-amber-700 dark:text-amber-300';
+    return 'bg-[color-mix(in_srgb,var(--warning)_20%,transparent)] text-[var(--warning)]';
   }
 
   if (status?.includes('\u672a\u5b8c\u6210')) {
-    return 'bg-red-500/15 text-red-700 dark:text-red-300';
+    return 'bg-[color-mix(in_srgb,var(--danger)_16%,transparent)] text-[var(--danger)]';
   }
 
-  return 'bg-blue-500/15 text-blue-700 dark:text-blue-300';
+  return 'bg-[color-mix(in_srgb,var(--brand)_16%,transparent)] text-[var(--brand-strong)]';
 }

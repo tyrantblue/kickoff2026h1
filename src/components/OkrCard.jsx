@@ -3,10 +3,12 @@ import { StatusBadge } from './StatusBadge.jsx';
 
 export function OkrCard({ maxKrs, okr }) {
   return (
-    <article className="grid h-full grid-rows-[auto_auto_1fr] gap-[18px] rounded-lg border border-[var(--line)] bg-[var(--surface)] p-[22px] transition hover:-translate-y-1 hover:shadow-[0_16px_30px_rgba(15,23,42,0.1)]">
+    <article className="grid h-full grid-rows-[auto_auto_1fr] gap-[18px] border border-[var(--line)] bg-[var(--surface)] p-[22px] transition hover:-translate-y-1 hover:border-[var(--brand)] hover:shadow-[var(--shadow)]">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-sm uppercase text-[var(--text-faint)]">{okr.code}</p>
+          <p className="w-fit border border-[var(--route-line)] bg-[var(--surface-muted)] px-2 py-1 text-sm uppercase text-[var(--brand)]">
+            {okr.code}
+          </p>
           <h3 className="mt-1.5 text-[22px] leading-[1.3]">{okr.objective}</h3>
         </div>
         <StatusBadge status={okr.status} />
@@ -15,7 +17,7 @@ export function OkrCard({ maxKrs, okr }) {
       <div className="grid auto-rows-fr gap-3.5">
         {okr.krs.map((kr) => (
           <div
-            className="flex h-full flex-col gap-3 rounded-lg border border-[var(--card-muted-border)] bg-[var(--card-muted)] p-4 transition hover:translate-x-0.5 hover:border-[var(--brand)]"
+            className="flex h-full flex-col gap-3 border border-[var(--card-muted-border)] bg-[var(--card-muted)] p-4 transition hover:translate-x-0.5 hover:border-[var(--brand)]"
             key={kr.title}
           >
             <div className="flex items-start justify-between gap-3">
@@ -31,7 +33,7 @@ export function OkrCard({ maxKrs, okr }) {
         {Array.from({ length: Math.max(0, maxKrs - okr.krs.length) }).map((_, index) => (
           <div
             aria-hidden="true"
-            className="invisible flex h-full flex-col gap-3 rounded-lg border border-[var(--card-muted-border)] bg-[var(--card-muted)] p-4"
+            className="invisible flex h-full flex-col gap-3 border border-[var(--card-muted-border)] bg-[var(--card-muted)] p-4"
             key={`${okr.objective}-placeholder-${index}`}
           >
             <div className="flex items-start justify-between gap-3">

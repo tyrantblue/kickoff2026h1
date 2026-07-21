@@ -9,7 +9,7 @@ export function Header({ activeSection, activeTheme, navItems, onNavigate, onThe
   return (
     <header className="sticky top-0 z-20 flex items-center justify-between gap-6 border-b border-[var(--line)] bg-[rgba(var(--header-rgb),0.88)] px-8 py-[18px] backdrop-blur-2xl transition-colors max-[820px]:flex-col max-[820px]:items-start max-[820px]:px-5">
       <a
-        className="inline-flex items-center gap-4 font-bold transition-transform hover:-translate-y-px max-[820px]:gap-3"
+        className="inline-flex items-center gap-4 font-bold max-[820px]:gap-3"
         href={`#${HOME_SECTION_ID}`}
         aria-label="回到首页"
         onClick={(event) => {
@@ -35,9 +35,9 @@ export function Header({ activeSection, activeTheme, navItems, onNavigate, onThe
             <a
               aria-current={activeSection === item.id ? 'page' : undefined}
               className={cn(
-                'rounded-full px-3 py-2 text-[var(--text-soft)] transition hover:-translate-y-px hover:bg-[var(--surface-muted)] hover:text-[var(--brand)] focus-visible:-translate-y-px focus-visible:bg-[var(--surface-muted)] focus-visible:text-[var(--brand)] focus-visible:outline-none',
+                'border border-transparent px-3 py-2 text-[var(--text-soft)] transition hover:-translate-y-px hover:border-[var(--route-line)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand)] focus-visible:-translate-y-px focus-visible:border-[var(--route-line)] focus-visible:bg-[var(--surface-muted)] focus-visible:text-[var(--brand)] focus-visible:outline-none',
                 activeSection === item.id &&
-                  'bg-[var(--surface-muted)] font-bold text-[var(--brand)] shadow-[inset_0_0_0_1px_rgba(37,99,235,0.18)]',
+                  'border-[var(--brand)] bg-[var(--surface-muted)] font-bold text-[var(--brand)]',
               )}
               href={`#${item.id}`}
               key={item.id}
@@ -51,7 +51,7 @@ export function Header({ activeSection, activeTheme, navItems, onNavigate, onThe
           ))}
         </nav>
         <button
-          className="inline-flex min-h-[38px] min-w-28 cursor-pointer items-center justify-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-[var(--text-soft)] transition hover:-translate-y-px hover:border-[var(--brand)] hover:text-[var(--brand)] hover:shadow-[0_10px_24px_rgba(37,99,235,0.12)] focus-visible:-translate-y-px focus-visible:border-[var(--brand)] focus-visible:text-[var(--brand)] focus-visible:outline-none"
+          className="inline-flex min-h-[38px] min-w-28 cursor-pointer items-center justify-center gap-2 border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-[var(--text-soft)] transition hover:-translate-y-px hover:border-[var(--brand)] hover:text-[var(--brand)] hover:shadow-[var(--shadow)] focus-visible:-translate-y-px focus-visible:border-[var(--brand)] focus-visible:text-[var(--brand)] focus-visible:outline-none"
           type="button"
           onClick={onThemeToggle}
           aria-label={`当前主题：${activeTheme.label}，点击切换`}

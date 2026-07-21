@@ -7,7 +7,7 @@ export function BackToTop({ activeSection, onNavigate }) {
   return (
     <a
       className={cn(
-        'fixed bottom-6 right-6 inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--surface-strong)] text-white shadow-[var(--shadow)] transition hover:-translate-y-0.5 hover:bg-[var(--brand)] focus-visible:outline-none',
+        'fixed bottom-6 right-6 inline-flex h-11 w-11 items-center justify-center border border-[var(--brand)] bg-[var(--surface)] text-[var(--brand-strong)] shadow-[var(--shadow)] transition hover:-translate-y-0.5 hover:bg-[var(--brand)] hover:text-[var(--surface)] focus-visible:outline-none',
         activeSection === HOME_SECTION_ID && 'pointer-events-none translate-y-2 opacity-0',
       )}
       href={`#${HOME_SECTION_ID}`}
